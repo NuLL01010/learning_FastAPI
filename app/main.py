@@ -1,8 +1,17 @@
-from fastapi import FastAPI
+from datetime import date
+from typing import Optional
+
+from fastapi import FastAPI, Query
 
 app = FastAPI()
 
 
-@app.get("/hotels/{hotels_id}")
-async def hotel(hotels_id: int, date_from, date_to):
-    return hotels_id, date_from, date_to
+@app.get("/hotels")
+async def hotel(
+        location: str,
+        date_from: date,
+        date_to: date,
+        stars: Optional[int] = Query(default=None, ge=1, le=5),
+        has_spa: Optional[bool] = None
+):
+    return location, date_from, date_to, stars, has_spa
