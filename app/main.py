@@ -1,10 +1,18 @@
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
 app = FastAPI()
+
+
+class Shotels(BaseModel):
+    location: str
+    date_from: str
+    date_to: str
+    stars: Optional[int] = Query(default=None, ge=1, le=5)
+    has_spa: Optional[bool] = None
 
 
 class Sregister(BaseModel):
@@ -17,16 +25,24 @@ class Sregister(BaseModel):
 @app.get("/hotels")
 async def hotels(
         location: str,
-        date_from: date,
-        date_to: date,
+        date_from: str,
+        date_to: str,
         stars: Optional[int] = Query(default=None, ge=1, le=5),
         has_spa: Optional[bool] = None
-):
-    return location, date_from, date_to, stars, has_spa
+) -> List[Shotels]:
+    return [
+        {
+            "location": location,
+            "date_from": date_from,
+            "date_to": date_to,
+            "stars": stars,
+            "has_spa": has_spa
+        }
+    ]
 
 
 @app.post("/register")
 async def register_user(
-    user: Sregister
+        user: Sregister
 ):
     return user
