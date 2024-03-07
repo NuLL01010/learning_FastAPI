@@ -2,12 +2,20 @@ from datetime import date
 from typing import Optional
 
 from fastapi import FastAPI, Query
+from pydantic import BaseModel
 
 app = FastAPI()
 
 
+class Sregister(BaseModel):
+    login: str
+    email: str
+    password: str
+    age: Optional[int] = None
+
+
 @app.get("/hotels")
-async def hotel(
+async def hotels(
         location: str,
         date_from: date,
         date_to: date,
@@ -15,3 +23,10 @@ async def hotel(
         has_spa: Optional[bool] = None
 ):
     return location, date_from, date_to, stars, has_spa
+
+
+@app.post("/register")
+async def register_user(
+    user: Sregister
+):
+    return user
