@@ -5,7 +5,7 @@ from environs import Env
 env = Env()
 env.read_env()
 
-DATABASE_URL = f'postgresql+asyncpg://{env.DB_USER}:{env.DB_PASS}@{env.DB_HOST}:{env.DB_PORT}/{env.DB_NAME}'
+DATABASE_URL = f"postgresql+asyncpg://{env('DB_USER')}:{env('DB_PASS')}@{env('DB_HOST')}:{env('DB_PORT')}/{env('DB_NAME')}"
 
 
 engine = create_async_engine(DATABASE_URL)
