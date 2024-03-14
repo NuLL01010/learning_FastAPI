@@ -1,53 +1,54 @@
-from datetime import date
-from typing import Optional, List
+from typing import Optional
 
 from fastapi import FastAPI, Query, Depends
 from pydantic import BaseModel
 
 from app.bookings.router import router as router_bookings
+from app.users.router import router as router_users
 
 app = FastAPI()
 
-app.include_router(router_bookings)
+app.include_router(router_users)
+app.include_router(router_bookings) #  uvicorn app.main:app --reload
 
-class HotelsArgs:
-    def __init__(
-            self,
-            location: str,
-            date_from: str,
-            date_to: str,
-            stars: Optional[int] = Query(default=None, ge=1, le=5),
-            has_spa: Optional[bool] = None
-    ):
-        self.location = location
-        self.date_from = date_from
-        self.date_to = date_to
-        self.stars = stars
-        self.has_spa = has_spa
-
-
-class Shotels(BaseModel):
-    location: str
-    date_from: str
-    date_to: str
-    stars: Optional[int] = Query(default=None, ge=1, le=5)
-    has_spa: Optional[bool] = None
+# class HotelsArgs:
+#     def __init__(
+#             self,
+#             location: str,
+#             date_from: str,
+#             date_to: str,
+#             stars: Optional[int] = Query(default=None, ge=1, le=5),
+#             has_spa: Optional[bool] = None
+#     ):
+#         self.location = location
+#         self.date_from = date_from
+#         self.date_to = date_to
+#         self.stars = stars
+#         self.has_spa = has_spa
 
 
-class Sregister(BaseModel):
-    login: str
-    email: str
-    password: str
-    age: Optional[int] = None
+# class Shotels(BaseModel):
+#     location: str
+#     date_from: str
+#     date_to: str
+#     stars: Optional[int] = Query(default=None, ge=1, le=5)
+#     has_spa: Optional[bool] = None
 
 
-@app.get("/hotels")
-async def hotels(search_args: HotelsArgs = Depends()):
-    return [search_args]
+# class Sregister(BaseModel):
+#     login: str
+#     email: str
+#     password: str
+#     age: Optional[int] = None
 
 
-@app.post("/register")
-async def register_user(
-        user: Sregister
-):
-    return user
+# @app.get("/hotels")
+# async def hotels(search_args: HotelsArgs = Depends()):
+#     return [search_args]
+
+
+# @app.post("/register")
+# async def register_user(
+#         user: Sregister
+# ):
+#     return user
