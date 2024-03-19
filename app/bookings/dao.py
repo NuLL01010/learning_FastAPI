@@ -1,13 +1,32 @@
 from datetime import date
+
+from httpx import delete
 from app.database import async_session_maker
 from app.database import engine
 from sqlalchemy import and_, func, insert, or_, select
 from app.bookings.models import Bookings
 from app.dao.base import BaseDAO
-from app.hotels.models import Rooms
+from app.hotels.rooms.models import Rooms
 
 class BookingsDAO(BaseDAO):
 	model = Bookings
+
+
+	@classmethod
+	async def find_all_with_images(cls, user_id: int):
+		async with async_session_maker() as session:
+			query = (
+				select(
+					# __table__.columns нужен для отсутствия вложенности в ответе Алхимии
+					Bookings.__table__.columns,
+					Rooms.__table__.columns,
+				)
+				.join(Rooms, Rooms.id == Bookings.room_id, isouter=True)
+				.where(Bookings.user_id == user_id)
+			)
+			result = await session.execute(query)
+			return result.mappings().all()
+
 
 	@classmethod
 	async def add(cls, user_id: int, room_id: int, date_from: date, date_to: date):
@@ -35,10 +54,10 @@ class BookingsDAO(BaseDAO):
 				Rooms.quantity, booked_rooms.c.room_id
 			)
 
-			# print(rooms_left.compile(engine, compile_kwargs={"literal_binds": True}))
-
 			rooms_left = await session.execute(rooms_left)
 			rooms_left: int = rooms_left.scalar()
+
+			# print(rooms_left.compile(engine, compile_kwargs={"literal_binds": True}))
 
 			if rooms_left > 0:
 				get_price = select(Rooms.price).filter_by(id=room_id)

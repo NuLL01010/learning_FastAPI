@@ -1,54 +1,53 @@
 from typing import Optional
 
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Query, Depends
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
+from app.images.router import router as router_images
+from app.pages.router import router as router_pages
+from app.hotels.router import router as router_hotels
 from app.bookings.router import router as router_bookings
 from app.users.router import router as router_users
+from app.hotels.rooms.router import router as router_rooms
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+
+from redis import asyncio as aioredis
+
 
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="app/static"), "static")
+
+
 app.include_router(router_users)
 app.include_router(router_bookings) #  uvicorn app.main:app --reload
+app.include_router(router_hotels)
+app.include_router(router_rooms)
 
-# class HotelsArgs:
-#     def __init__(
-#             self,
-#             location: str,
-#             date_from: str,
-#             date_to: str,
-#             stars: Optional[int] = Query(default=None, ge=1, le=5),
-#             has_spa: Optional[bool] = None
-#     ):
-#         self.location = location
-#         self.date_from = date_from
-#         self.date_to = date_to
-#         self.stars = stars
-#         self.has_spa = has_spa
+app.include_router(router_pages)
+app.include_router(router_images)
 
 
-# class Shotels(BaseModel):
-#     location: str
-#     date_from: str
-#     date_to: str
-#     stars: Optional[int] = Query(default=None, ge=1, le=5)
-#     has_spa: Optional[bool] = None
+# origins = [
+# 	"https://localhost:3000",
+# ]
+
+# app.add_middleware(
+# 	CORSMiddleware,
+# 	allow_origins=origins,
+# 	allow_credentails=True,
+# 	allow_methods=["GET", "POST", "DELETE", "PUT", "PUTH", "OPTIONS"],
+# 	allow_headers=["Content-Type", "Set_Cookie", "Access-Control-Allow-Headers",
+# 				 "Access-Control-Allow-Origin", "Authorization"]
+# )
 
 
-# class Sregister(BaseModel):
-#     login: str
-#     email: str
-#     password: str
-#     age: Optional[int] = None
-
-
-# @app.get("/hotels")
-# async def hotels(search_args: HotelsArgs = Depends()):
-#     return [search_args]
-
-
-# @app.post("/register")
-# async def register_user(
-#         user: Sregister
-# ):
-#     return user
+@app.on_event("startup")
+async def startup():
+    redis = aioredis.from_url("redis://localhost")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
