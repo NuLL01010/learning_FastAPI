@@ -14,7 +14,7 @@ from app.hotels.rooms.router import router as router_rooms
 
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-# from fastapi_cache.decorator import cache
+from fastapi_cache.decorator import cache
 
 from redis import asyncio as aioredis
 

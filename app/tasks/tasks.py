@@ -1,14 +1,13 @@
-import smtplib
-from pydantic import EmailStr
-from app.config import settings
 from app.tasks.celery import celery
 from pathlib import Path
 from PIL import Image
-
+import smtplib
+from pydantic import EmailStr
+from app.config import settings
 from app.tasks.email_templates import create_booking_confirmation_template
 
 
-@celery.task
+@celery.task()
 def upload_image(
 		paht: int
 ):
@@ -18,6 +17,7 @@ def upload_image(
 	im_resized_1000_500 = im.resize((1000, 500))
 	im_resized_300_200.save(f"app/static/images/im_resized_300_200{im_path.name}")
 	im_resized_1000_500.save(f"app/static/images/im_resized_1000_500{im_path.name}")
+
 
 
 @celery.task
