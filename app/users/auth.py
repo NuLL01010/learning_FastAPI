@@ -2,14 +2,13 @@
 
 from passlib.context import CryptContext
 from jwt import encode
-from app.config import EnvCofig
+from app.config import settings
 
 from app.users.dao import UsersDAO
 from datetime import datetime, timedelta
 
 
 
-settings = EnvCofig()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -1,12 +1,15 @@
 from datetime import date
 from fastapi import APIRouter, Depends
+from pydantic import parse_obj_as
 from app.bookings.dao import BookingsDAO
 from app.bookings.schemas import SBooking, SBookingInfo
+from app.config import settings
 from app.exeption import RoomCanotBeBooked
+from app.tasks.tasks import send_booking_confirmation_email
 from app.users.dao import UsersDAO
 from app.users.dependencies import get_current_user
 from app.users.models import Users
-
+from pydantic.type_adapter import TypeAdapter
 
 
 router = APIRouter(
@@ -26,8 +29,13 @@ async def add_booking(
     room_id: int, date_from: date, date_to: date,
     user: Users = Depends(get_current_user)
 ):
-    return await BookingsDAO.add(user_id=user.id, room_id=room_id, date_from=date_from, date_to=date_to)
+    booking = await BookingsDAO.add(user_id=user.id, room_id=room_id, date_from=date_from, date_to=date_to)
 
+    # booking_dict = TypeAdapter.validate_python(SBooking, booking, strict=False).dict()
+    # booking_dict = parse_obj_as(SBooking, booking).dict()
+
+    # send_booking_confirmation_email.delay() не работает, ебал гугл и форматы с которыми работает EmailMessage
+    return booking
 
 @router.delete("/{booking_id}")
 async def remove_booking(

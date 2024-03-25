@@ -1,6 +1,6 @@
 from environs import Env
 
-class EnvCofig:
+class Settings:
 	env = Env()
 	env.read_env()
 
@@ -12,3 +12,11 @@ class EnvCofig:
 
 	SECRET_KEY = env('SECRET_KEY')
 	ALGORITHM = env('ALGORITHM')
+
+	SMTP_USER=env('SMTP_USER')
+	SMTP_PASS=env('SMTP_PASS')
+	SMTP_HOST=env('SMTP_HOST')
+	SMTP_PORT=env('SMTP_PORT')
+
+
+settings = Settings()

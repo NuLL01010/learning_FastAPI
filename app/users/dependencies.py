@@ -3,11 +3,11 @@ from fastapi import Depends, Request
 # from jose import JWTError
 from jwt import decode
 from jwt import PyJWTError
-from app.config import EnvCofig
+from app.config import settings
 from app.exeption import IncorrentTokenFormatException, TokenAbsentException, TokenExpiredexception, UserIsNotPresentExeption
 from app.users.dao import UsersDAO
 
-settings = EnvCofig()
+
 
 def get_token(request: Request):
 	token = request.cookies.get("Booking_accesss_token")
