@@ -9,9 +9,10 @@ from os.path import dirname, abspath
 import sys
 
 from app.database import Base, DATABASE_URL
-from app.hotels.models import Hotels, Rooms
-from app.bookings.models import Bookings
-from app.users.models import Users
+from app.hotels.models import Hotels        #noqa
+from app.hotels.rooms.models import Rooms     #noqa
+from app.bookings.models import Bookings    #noqa
+from app.users.models import Users      #noqa
 
 sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
 

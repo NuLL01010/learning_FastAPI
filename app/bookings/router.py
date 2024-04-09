@@ -1,5 +1,5 @@
 from datetime import date
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, BackgroundTasks, Depends
 from app.bookings.dao import BookingsDAO
 from app.bookings.schemas import SBooking, SBookingInfo
 from app.exeption import RoomCanotBeBooked
@@ -27,7 +27,9 @@ async def get_bookings(user: Users = Depends(get_current_user)) -> list[SBooking
 @router.post("")
 async def add_booking(
     room_id: int, date_from: date, date_to: date,
+    backgroundTasks: BackgroundTasks,
     user: Users = Depends(get_current_user)
+
 ):
     booking = await BookingsDAO.add(user_id=user.id, room_id=room_id, date_from=date_from, date_to=date_to)
 
@@ -35,6 +37,9 @@ async def add_booking(
     # booking_dict = parse_obj_as(SBooking, booking).dict()
 
     # send_booking_confirmation_email.delay() не работает, ебал гугл и форматы с которыми работает celery
+
+    backgroundTasks.add_task(send_booking_confirmation_email(booking, settings.SMTP_USER))
+
     return booking
 
 

@@ -20,7 +20,7 @@ def upload_image(
 
 
 
-@celery.task
+# @celery.task
 def send_booking_confirmation_email(
 	booking: dict,
 	email_to: EmailStr
